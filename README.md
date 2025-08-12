@@ -7,6 +7,7 @@ The HR Management System is a unified desktop application designed to replace a 
 This project was developed to solve key challenges including data inconsistency, time-consuming manual reporting, and a lack of a clear, real-time overview of the hiring pipeline.
 
 Key Features
+
 The system is a multi-module application built with a focus on user-friendliness for non-technical users.
 
 Central Main Menu: A simple hub to access all functionalities.
