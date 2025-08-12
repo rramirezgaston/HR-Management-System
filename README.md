@@ -1,6 +1,3 @@
-# HR-Management-System
-The system is a multi-module application built with a focus on user-friendliness for non-technical users.
-
 HR Management System
 Project Overview
 The HR Management System is a unified desktop application designed to replace a series of manual, error-prone Excel spreadsheets for tracking the full-cycle hiring process. Born from a real-world business need, this application centralizes candidate data, automates reporting, and provides at-a-glance analytics to streamline the entire recruitment workflow for an HR team.
