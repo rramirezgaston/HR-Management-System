@@ -33,16 +33,18 @@ The system is a multi-module application built with a focus on user-friendliness
 **System Administration:** A user-friendly control panel for non-technical users to manage the core data of the system (Jobs, Interviewers, Hiring Class dates).
 
 Technical Stack
-Language: Python
 
-GUI Library: Tkinter (ttk for modern widgets)
+**Language:** Python
 
-Database: SQLite 3
+**GUI Library:** Tkinter (ttk for modern widgets)
 
-Additional Libraries: tkcalendar
+**Database:** SQLite 3
+
+**Additional Libraries:** tkcalendar
 
 Screenshots
-(Here, you can add screenshots of the application. Good examples would be the Main Menu, the Dashboard, and the Applicant Tracker.)
+
+
 
 Main Menu
 
@@ -51,6 +53,7 @@ HR Dashboard
 Applicant Tracker
 
 Setup & Installation
+
 Ensure you have Python 3 installed.
 
 Install the required tkcalendar library: pip install tkcalendar
