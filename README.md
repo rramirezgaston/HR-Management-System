@@ -45,15 +45,23 @@ The system is a multi-module application built with a focus on user-friendliness
 
 
 
-Screenshots
-
-
+**Screenshots**
 
 Main Menu
 
+<img width="496" height="651" alt="image" src="https://github.com/user-attachments/assets/51188b5a-d11e-441f-b902-f1c76359b9dd" />
+
 HR Dashboard
 
+<img width="1095" height="732" alt="image" src="https://github.com/user-attachments/assets/4dd823e8-0702-417c-8488-b3ae4edb1d8f" />
+
 Applicant Tracker
+
+<img width="899" height="847" alt="image" src="https://github.com/user-attachments/assets/35d2dd2a-646a-42ce-9833-763d5b252472" />
+
+
+
+
 
 **Setup & Installation**
 
