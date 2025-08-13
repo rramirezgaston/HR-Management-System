@@ -73,4 +73,4 @@ Applicant Tracker
 
 - Create the database schema by running the database_setup.sql script in a SQLite management tool (like DB Browser for SQLite).
 
-- Run the latest version of HR_System_vx.x.x.pyw file to launch the application.
+- Run the latest version of Unified HR Management System.pyw file to launch the application.
