@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import webbrowser
 import os
-#import datetime  -- Not used, but her if needed
+import datetime  #-- Not used, but here if needed  # noqa: F401
 import sqlite3
 from common import center_window, get_db_connection
 from new_candidate import NewCandidateApp

@@ -1,7 +1,8 @@
 import sqlite3
 import os
+import tkinter as tk # Imported to provide type hints and access to Tkinter constants/methods if needed.  # noqa: F401
 
-# --- Version 1.1.5 ---
+# --- Version 2.0.1 ---
 
 # --- Configuration ---
 # Get the absolute path of the directory where this script is located
