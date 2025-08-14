@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import webbrowser
 import os
-import datetime
+#import datetime  -- Not used, but her if needed
 import sqlite3
 from common import center_window, get_db_connection
 from new_candidate import NewCandidateApp
@@ -13,7 +13,7 @@ from applicant_tracker import ApplicantTrackerApp
 from reports import ReportsApp
 from admin import AdminApp
 
-# --- Version 2.0.0 ---
+# --- Version 2.0.1 ---
 
 class MainApp(tk.Tk):
     def __init__(self):
@@ -61,17 +61,30 @@ class MainApp(tk.Tk):
 
     def open_window(self, window_class):
         try:
-            win = window_class(self)
+            window_class(self)
         except Exception as e:
             messagebox.showerror("Application Error", f"Could not open window: {e}")
 
-    def open_new_candidate_window(self): self.open_window(NewCandidateApp)
-    def open_search_window(self): self.open_window(SearchApp)
-    def open_historical_viewer_window(self): self.open_window(HistoricalViewerApp)
-    def open_dashboard_window(self): self.open_window(DashboardApp)
-    def open_admin_window(self): self.open_window(AdminApp)
-    def open_reports_window(self): self.open_window(ReportsApp)
-    def open_applicant_tracker_window(self): self.open_window(ApplicantTrackerApp)
+    def open_new_candidate_window(self):
+        self.open_window(NewCandidateApp)
+
+    def open_search_window(self):
+        self.open_window(SearchApp)
+
+    def open_historical_viewer_window(self):
+        self.open_window(HistoricalViewerApp)
+
+    def open_dashboard_window(self):
+        self.open_window(DashboardApp)
+
+    def open_admin_window(self):
+        self.open_window(AdminApp)
+
+    def open_reports_window(self):
+        self.open_window(ReportsApp)
+
+    def open_applicant_tracker_window(self):
+        self.open_window(ApplicantTrackerApp)
     
     def generate_weekly_report(self):
         try:
@@ -90,9 +103,7 @@ class MainApp(tk.Tk):
                 if not any(row[lang_column_index] == 'S' for row in rows):
                     display_headers = [h for h in headers if h != 'Lang']
                     display_rows = [tuple(cell for i, cell in enumerate(row) if i != lang_column_index) for row in rows]
-            today = datetime.date.today()
-            next_monday = today + datetime.timedelta(days=-today.weekday(), weeks=1)
-            report_date_str = next_monday.strftime('%B %d, %Y')
+            
             html_content = f"""
             <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Weekly New Hire Report</title>
             <style>
@@ -104,25 +115,31 @@ class MainApp(tk.Tk):
             </style></head><body><div class="container">
             <p>Happy Friday,</p><p>This coming week, we will be having the following ({new_selectors_count}) New Selectors.</p>
             """
-            if not display_rows: html_content += "<p style='font-style: italic; color: #555;'>No new hires are fully cleared to start for the upcoming week.</p>"
+            if not display_rows:
+                html_content += "<p style='font-style: italic; color: #555;'>No new hires are fully cleared to start for the upcoming week.</p>"
             else:
                 html_content += "<hr style='margin-top: 20px; margin-bottom: 20px; border: 0; border-top: 1px solid #ddd;'>"
                 html_content += "<table><thead><tr>"
-                for header in display_headers: html_content += f"<th>{header}</th>"
+                for header in display_headers:
+                    html_content += f"<th>{header}</th>"
                 html_content += "</tr></thead><tbody>"
                 for row in display_rows:
                     html_content += "<tr>"
-                    for cell in row: html_content += f"<td>{str(cell).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')}</td>"
+                    for cell in row:
+                        html_content += f"<td>{str(cell).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')}</td>"
                     html_content += "</tr>"
                 html_content += "</tbody></table>"
             html_content += "</div></body></html>"
             output_filename = 'weekly_report.html'
-            with open(output_filename, 'w', encoding='utf-8') as file: file.write(html_content)
+            with open(output_filename, 'w', encoding='utf-8') as file:
+                file.write(html_content)
             full_path = os.path.abspath(output_filename)
             webbrowser.open_new_tab(f"file://{full_path}")
             messagebox.showinfo("Success", f"Report generated successfully and opened in your browser!\n\nSaved as: {full_path}")
-        except sqlite3.Error as e: messagebox.showerror("Database Error", f"Failed to generate report: {e}\n\nPlease ensure the 'V_Cleared_Hires_Next_Week' VIEW exists.")
-        except Exception as e: messagebox.showerror("Error", f"An unexpected error occurred: {e}", parent=self)
+        except sqlite3.Error as e:
+            messagebox.showerror("Database Error", f"Failed to generate report: {e}\n\nPlease ensure the 'V_Cleared_Hires_Next_Week' VIEW exists.")
+        except Exception as e:
+            messagebox.showerror("Error", f"An unexpected error occurred: {e}", parent=self)
 
 if __name__ == "__main__":
     app = MainApp()

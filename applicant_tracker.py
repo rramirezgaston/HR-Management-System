@@ -4,6 +4,9 @@ from tkinter import ttk, messagebox
 from tkcalendar import DateEntry
 from common import get_db_connection, center_window
 
+# ==================================================================
+# APPLICANT TRACKER MODULE
+# ==================================================================
 class ApplicantTrackerApp(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
@@ -136,11 +139,15 @@ class ApplicantTrackerApp(tk.Toplevel):
     def load_data_for_date(self, event=None):
         selected_date = self.date_entry.get_date().strftime("%Y-%m-%d")
         
-        for var in self.metric_vars.values(): var.set('0')
-        for var in self.breakdown_vars.values(): var.set('0')
+        for var in self.metric_vars.values():
+            var.set('0')
+        for var in self.breakdown_vars.values():
+            var.set('0')
 
         try:
-            conn = get_db_connection(); conn.row_factory = sqlite3.Row; cursor = conn.cursor()
+            conn = get_db_connection()
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
             cursor.execute("SELECT * FROM Daily_Metrics WHERE metric_date = ?", (selected_date,))
             metric_data = cursor.fetchone()
 
@@ -156,8 +163,10 @@ class ApplicantTrackerApp(tk.Toplevel):
                     if key in self.breakdown_vars:
                         self.breakdown_vars[key].set(str(row['count']))
             
-            for key, var in self.metric_vars.items(): self.previous_values[key.replace(" ", "_")] = var.get()
-            for key, var in self.breakdown_vars.items(): self.previous_values[key] = var.get()
+            for key, var in self.metric_vars.items():
+                self.previous_values[key.replace(" ", "_")] = var.get()
+            for key, var in self.breakdown_vars.items():
+                self.previous_values[key] = var.get()
 
             conn.close()
         except sqlite3.Error as e:
@@ -170,7 +179,8 @@ class ApplicantTrackerApp(tk.Toplevel):
             self._validate_and_revert(var, key.replace(" ", "_"))
 
         try:
-            conn = get_db_connection(); cursor = conn.cursor()
+            conn = get_db_connection()
+            cursor = conn.cursor()
             
             cursor.execute("SELECT metric_id FROM Daily_Metrics WHERE metric_date = ?", (selected_date,))
             result = cursor.fetchone()

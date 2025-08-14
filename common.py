@@ -1,9 +1,7 @@
 import sqlite3
-import tkinter as tk
-from tkinter import ttk, messagebox
 import os
 
-# --- Version 2.0.0 ---
+# --- Version 1.1.5 ---
 
 # --- Configuration ---
 # Get the absolute path of the directory where this script is located

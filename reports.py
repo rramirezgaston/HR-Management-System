@@ -18,60 +18,78 @@ class ReportsApp(tk.Toplevel):
         center_window(self, parent)
 
     def create_widgets(self):
-        main_frame = ttk.Frame(self, padding="20"); main_frame.pack(fill=tk.BOTH, expand=True)
-        controls_frame = ttk.LabelFrame(main_frame, text="Report Options", padding="10"); controls_frame.pack(fill=tk.X, pady=(0, 15))
+        main_frame = ttk.Frame(self, padding="20")
+        main_frame.pack(fill=tk.BOTH, expand=True)
+        controls_frame = ttk.LabelFrame(main_frame, text="Report Options", padding="10")
+        controls_frame.pack(fill=tk.X, pady=(0, 15))
         ttk.Label(controls_frame, text="Select Report:").pack(side=tk.LEFT, padx=(0, 10))
         self.report_var = tk.StringVar()
         report_options = ["Weekly Activity Snapshot", "Referral Leaderboard", "Hires by Department", "Search by Referrer", "Last Week's Referrals", "Referrals by Class Week"]
-        self.report_combo = ttk.Combobox(controls_frame, textvariable=self.report_var, values=report_options, state="readonly", width=30); self.report_combo.pack(side=tk.LEFT, padx=5)
+        self.report_combo = ttk.Combobox(controls_frame, textvariable=self.report_var, values=report_options, state="readonly", width=30)
+        self.report_combo.pack(side=tk.LEFT, padx=5)
         self.report_combo.bind("<<ComboboxSelected>>", self.on_report_select)
-        self.dynamic_controls_frame = ttk.Frame(controls_frame); self.dynamic_controls_frame.pack(side=tk.LEFT, padx=20)
-        self.generate_button = ttk.Button(controls_frame, text="Generate", command=self.run_report); self.generate_button.pack(side=tk.LEFT)
+        self.dynamic_controls_frame = ttk.Frame(controls_frame)
+        self.dynamic_controls_frame.pack(side=tk.LEFT, padx=20)
+        self.generate_button = ttk.Button(controls_frame, text="Generate", command=self.run_report)
+        self.generate_button.pack(side=tk.LEFT)
         
         self.results_frame = ttk.Frame(main_frame)
         self.results_frame.pack(fill=tk.BOTH, expand=True)
         self.single_tree_frame, self.single_tree = self.create_single_results_tree(self.results_frame)
         self.referral_paned_window = ttk.PanedWindow(self.results_frame, orient=tk.VERTICAL)
-        self.referrals_frame = ttk.LabelFrame(self.referral_paned_window, text="Candidates WITH Referrals", padding="10"); self.referral_paned_window.add(self.referrals_frame, weight=1)
+        self.referrals_frame = ttk.LabelFrame(self.referral_paned_window, text="Candidates WITH Referrals", padding="10")
+        self.referral_paned_window.add(self.referrals_frame, weight=1)
         self.referrals_tree = self.create_referral_tree(self.referrals_frame)
-        self.no_referrals_frame = ttk.LabelFrame(self.referral_paned_window, text="Candidates WITHOUT Referrals", padding="10"); self.referral_paned_window.add(self.no_referrals_frame, weight=1)
+        self.no_referrals_frame = ttk.LabelFrame(self.referral_paned_window, text="Candidates WITHOUT Referrals", padding="10")
+        self.referral_paned_window.add(self.no_referrals_frame, weight=1)
         self.no_referrals_tree = self.create_referral_tree(self.no_referrals_frame, show_referrer=False)
         
     def create_single_results_tree(self, parent):
         frame = ttk.Frame(parent)
         tree = ttk.Treeview(frame, show='headings')
-        v_scroll = ttk.Scrollbar(frame, orient=tk.VERTICAL, command=tree.yview); tree.configure(yscroll=v_scroll.set)
-        h_scroll = ttk.Scrollbar(frame, orient=tk.HORIZONTAL, command=tree.xview); tree.configure(xscroll=h_scroll.set)
-        v_scroll.pack(side=tk.RIGHT, fill=tk.Y); h_scroll.pack(side=tk.BOTTOM, fill=tk.X)
+        v_scroll = ttk.Scrollbar(frame, orient=tk.VERTICAL, command=tree.yview)
+        tree.configure(yscroll=v_scroll.set)
+        h_scroll = ttk.Scrollbar(frame, orient=tk.HORIZONTAL, command=tree.xview)
+        tree.configure(xscroll=h_scroll.set)
+        v_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        h_scroll.pack(side=tk.BOTTOM, fill=tk.X)
         tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         return frame, tree
 
     def create_referral_tree(self, parent, show_referrer=True):
         cols = ('last_name', 'first_name', 'referred_by', 'department', 'status') if show_referrer else ('last_name', 'first_name', 'department', 'status')
         tree = ttk.Treeview(parent, columns=cols, show='headings')
-        for col in cols: tree.heading(col, text=col.replace('_', ' ').title())
-        v_scroll = ttk.Scrollbar(parent, orient=tk.VERTICAL, command=tree.yview); tree.configure(yscroll=v_scroll.set)
-        h_scroll = ttk.Scrollbar(parent, orient=tk.HORIZONTAL, command=tree.xview); tree.configure(xscroll=h_scroll.set)
-        v_scroll.pack(side=tk.RIGHT, fill=tk.Y); h_scroll.pack(side=tk.BOTTOM, fill=tk.X)
+        for col in cols:
+            tree.heading(col, text=col.replace('_', ' ').title())
+        v_scroll = ttk.Scrollbar(parent, orient=tk.VERTICAL, command=tree.yview)
+        tree.configure(yscroll=v_scroll.set)
+        h_scroll = ttk.Scrollbar(parent, orient=tk.HORIZONTAL, command=tree.xview)
+        tree.configure(xscroll=h_scroll.set)
+        v_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        h_scroll.pack(side=tk.BOTTOM, fill=tk.X)
         tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         return tree
 
     def on_report_select(self, event):
         report_type = self.report_var.get()
-        for widget in self.dynamic_controls_frame.winfo_children(): widget.destroy()
+        for widget in self.dynamic_controls_frame.winfo_children():
+            widget.destroy()
         
         self.single_tree_frame.pack_forget()
         self.referral_paned_window.pack_forget()
         
         if report_type == "Search by Referrer":
             ttk.Label(self.dynamic_controls_frame, text="Referrer Name:").pack(side=tk.LEFT)
-            self.referrer_search_entry = ttk.Entry(self.dynamic_controls_frame, width=25); self.referrer_search_entry.pack(side=tk.LEFT)
+            self.referrer_search_entry = ttk.Entry(self.dynamic_controls_frame, width=25)
+            self.referrer_search_entry.pack(side=tk.LEFT)
             self.single_tree_frame.pack(fill=tk.BOTH, expand=True)
         elif report_type == "Hires by Department":
             ttk.Label(self.dynamic_controls_frame, text="Start Date (YYYY-MM-DD):").pack(side=tk.LEFT)
-            self.start_date_entry = ttk.Entry(self.dynamic_controls_frame, width=12); self.start_date_entry.pack(side=tk.LEFT, padx=(0, 5))
+            self.start_date_entry = ttk.Entry(self.dynamic_controls_frame, width=12)
+            self.start_date_entry.pack(side=tk.LEFT, padx=(0, 5))
             ttk.Label(self.dynamic_controls_frame, text="End Date:").pack(side=tk.LEFT)
-            self.end_date_entry = ttk.Entry(self.dynamic_controls_frame, width=12); self.end_date_entry.pack(side=tk.LEFT)
+            self.end_date_entry = ttk.Entry(self.dynamic_controls_frame, width=12)
+            self.end_date_entry.pack(side=tk.LEFT)
             self.single_tree_frame.pack(fill=tk.BOTH, expand=True)
         elif report_type == "Last Week's Referrals" or report_type == "Referrals by Class Week":
             self.referral_paned_window.pack(fill=tk.BOTH, expand=True)
@@ -80,70 +98,98 @@ class ReportsApp(tk.Toplevel):
                 self.class_report_combo = ttk.Combobox(self.dynamic_controls_frame, state="readonly")
                 self.class_report_combo.pack(side=tk.LEFT)
                 try:
-                    conn = get_db_connection(); cursor = conn.cursor()
+                    conn = get_db_connection()
+                    cursor = conn.cursor()
                     cursor.execute("SELECT strftime('%Y-%m-%d', class_date) FROM Hiring_Classes ORDER BY class_date DESC;")
                     self.class_report_combo['values'] = [row[0] for row in cursor.fetchall()]
                     conn.close()
-                except Exception as e: messagebox.showerror("DB Error", f"Could not load class dates: {e}", parent=self)
+                except Exception as e:
+                    messagebox.showerror("DB Error", f"Could not load class dates: {e}", parent=self)
         else:
             self.single_tree_frame.pack_forget()
             self.referral_paned_window.pack_forget()
 
     def run_report(self):
         report_type = self.report_var.get()
-        if not report_type: messagebox.showwarning("Selection Error", "Please select a report to run.", parent=self); return
+        if not report_type:
+            messagebox.showwarning("Selection Error", "Please select a report to run.", parent=self)
+            return
         
         try:
-            conn = get_db_connection(); conn.row_factory = sqlite3.Row; cursor = conn.cursor()
+            conn = get_db_connection()
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
             
             if report_type == "Weekly Activity Snapshot":
                 self.generate_weekly_activity_report(cursor)
             elif report_type == "Referral Leaderboard":
-                for item in self.single_tree.get_children(): self.single_tree.delete(item)
+                for item in self.single_tree.get_children():
+                    self.single_tree.delete(item)
                 self.setup_treeview(self.single_tree, ['Referrer', 'Total Referrals'])
                 query = "SELECT referred_by, COUNT(*) FROM Candidates WHERE referred_by IS NOT NULL AND referred_by != '' GROUP BY referred_by ORDER BY COUNT(*) DESC;"
                 cursor.execute(query)
                 results = cursor.fetchall()
-                if not results: self.single_tree.insert('', tk.END, values=("No results found.",))
+                if not results:
+                    self.single_tree.insert('', tk.END, values=("No results found.",))
                 else:
-                    for row in results: self.single_tree.insert('', tk.END, values=tuple(row))
+                    for row in results:
+                        self.single_tree.insert('', tk.END, values=tuple(row))
 
             elif report_type == "Hires by Department":
-                for item in self.single_tree.get_children(): self.single_tree.delete(item)
+                for item in self.single_tree.get_children():
+                    self.single_tree.delete(item)
                 self.setup_treeview(self.single_tree, ['Department', 'Total Hires'])
-                start_date = self.start_date_entry.get().strip(); end_date = self.end_date_entry.get().strip()
-                query = "SELECT j.department, COUNT(*) FROM Candidates c JOIN Jobs j ON c.fk_job_id = j.job_id WHERE c.candidate_status = 'Hired'"; params = []
-                if start_date: query += " AND c.interview_date >= ?"; params.append(start_date)
-                if end_date: query += " AND c.interview_date <= ?"; params.append(end_date)
+                start_date = self.start_date_entry.get().strip()
+                end_date = self.end_date_entry.get().strip()
+                query = "SELECT j.department, COUNT(*) FROM Candidates c JOIN Jobs j ON c.fk_job_id = j.job_id WHERE c.candidate_status = 'Hired'"
+                params = []
+                if start_date:
+                    query += " AND c.interview_date >= ?"
+                    params.append(start_date)
+                if end_date:
+                    query += " AND c.interview_date <= ?"
+                    params.append(end_date)
                 query += " GROUP BY j.department ORDER BY COUNT(*) DESC;"
                 cursor.execute(query, params)
                 results = cursor.fetchall()
-                if not results: self.single_tree.insert('', tk.END, values=("No results found.",))
+                if not results:
+                    self.single_tree.insert('', tk.END, values=("No results found.",))
                 else:
-                    for row in results: self.single_tree.insert('', tk.END, values=tuple(row))
+                    for row in results:
+                        self.single_tree.insert('', tk.END, values=tuple(row))
 
             elif report_type == "Search by Referrer":
-                for item in self.single_tree.get_children(): self.single_tree.delete(item)
+                for item in self.single_tree.get_children():
+                    self.single_tree.delete(item)
                 self.setup_treeview(self.single_tree, ['Last Name', 'First Name', 'Department', 'Status'])
                 referrer_name = self.referrer_search_entry.get().strip()
-                if not referrer_name: messagebox.showwarning("Input Error", "Please enter a referrer name to search.", parent=self); conn.close(); return
+                if not referrer_name:
+                    messagebox.showwarning("Input Error", "Please enter a referrer name to search.", parent=self)
+                    conn.close()
+                    return
                 query = "SELECT c.last_name, c.first_name, j.department, c.candidate_status FROM Candidates c LEFT JOIN Jobs j ON c.fk_job_id = j.job_id WHERE c.referred_by LIKE ? ORDER BY c.last_name;"
                 cursor.execute(query, (f"%{referrer_name}%",))
                 results = cursor.fetchall()
-                if not results: self.single_tree.insert('', tk.END, values=("No results found.",))
+                if not results:
+                    self.single_tree.insert('', tk.END, values=("No results found.",))
                 else:
-                    for row in results: self.single_tree.insert('', tk.END, values=tuple(row))
+                    for row in results:
+                        self.single_tree.insert('', tk.END, values=tuple(row))
             
             elif report_type == "Last Week's Referrals" or report_type == "Referrals by Class Week":
                 for tree in [self.referrals_tree, self.no_referrals_tree]:
-                    for item in tree.get_children(): tree.delete(item)
+                    for item in tree.get_children():
+                        tree.delete(item)
                 
                 if report_type == "Last Week's Referrals":
                     query = "SELECT c.last_name, c.first_name, j.department, c.candidate_status, c.referred_by FROM Candidates c LEFT JOIN Jobs j ON c.fk_job_id = j.job_id WHERE c.interview_date BETWEEN date('now', 'weekday 1', '-7 days') AND date('now', 'weekday 1', '-1 day');"
                     cursor.execute(query)
                 else: # Referrals by Class Week
                     class_date = self.class_report_combo.get()
-                    if not class_date: messagebox.showwarning("Input Error", "Please select a class date.", parent=self); conn.close(); return
+                    if not class_date:
+                        messagebox.showwarning("Input Error", "Please select a class date.", parent=self)
+                        conn.close()
+                        return
                     query = "SELECT c.last_name, c.first_name, j.department, c.candidate_status, c.referred_by FROM Candidates c LEFT JOIN Jobs j ON c.fk_job_id = j.job_id JOIN Hiring_Classes hc ON c.fk_class_id = hc.class_id WHERE hc.class_date = ?;"
                     cursor.execute(query, (class_date,))
 
@@ -153,12 +199,16 @@ class ReportsApp(tk.Toplevel):
                     self.no_referrals_tree.insert('', tk.END, values=("No candidates found for this period.",))
                 else:
                     for row in results:
-                        if row['referred_by']: self.referrals_tree.insert('', tk.END, values=(row['last_name'], row['first_name'], row['referred_by'], row['department'], row['candidate_status']))
-                        else: self.no_referrals_tree.insert('', tk.END, values=(row['last_name'], row['first_name'], row['department'], row['candidate_status']))
+                        if row['referred_by']:
+                            self.referrals_tree.insert('', tk.END, values=(row['last_name'], row['first_name'], row['referred_by'], row['department'], row['candidate_status']))
+                        else:
+                            self.no_referrals_tree.insert('', tk.END, values=(row['last_name'], row['first_name'], row['department'], row['candidate_status']))
 
             conn.close()
-        except sqlite3.Error as e: messagebox.showerror("Database Error", f"Failed to run report: {e}", parent=self)
-        except Exception as e: messagebox.showerror("Error", f"An unexpected error occurred: {e}", parent=self)
+        except sqlite3.Error as e:
+            messagebox.showerror("Database Error", f"Failed to run report: {e}", parent=self)
+        except Exception as e:
+            messagebox.showerror("Error", f"An unexpected error occurred: {e}", parent=self)
 
     def setup_treeview(self, tree, columns):
         tree['columns'] = columns
@@ -225,7 +275,8 @@ class ReportsApp(tk.Toplevel):
         """
         
         output_filename = 'weekly_activity_snapshot.html'
-        with open(output_filename, 'w', encoding='utf-8') as file: file.write(html_content)
+        with open(output_filename, 'w', encoding='utf-8') as file:
+            file.write(html_content)
         full_path = os.path.abspath(output_filename)
         webbrowser.open_new_tab(f"file://{full_path}")
         messagebox.showinfo("Success", f"Report generated successfully and opened in your browser!\n\nSaved as: {full_path}", parent=self)
