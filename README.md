@@ -73,4 +73,4 @@ Applicant Tracker
 
 - Create the database schema by running the database_setup.sql script in a SQLite management tool (like DB Browser for SQLite).
 
-- Run the **main.py** file to launch the application.
+- Run the **main.pyw** file to launch the application.
