@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import webbrowser
 import os
-import datetime  #-- Not used, but here if needed  # noqa: F401
+import datetime  # noqa: F401
 import sqlite3
 from common import center_window, get_db_connection
 from new_candidate import NewCandidateApp
@@ -15,6 +15,11 @@ from admin import AdminApp
 
 # --- Version 2.0.1 ---
 
+# ==================================================================
+# MAIN APPLICATION CLASS
+# ==================================================================
+# This class defines the main application window and acts as the central
+# hub for launching all other modules. It is the primary entry point.
 class MainApp(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -22,6 +27,8 @@ class MainApp(tk.Tk):
         self.title("HR Management System")
         self.geometry("500x620")
         
+        # --- Styling ---
+        # This section sets up the visual theme and color palette for the entire application.
         self.style = ttk.Style(self)
         self.style.theme_use('clam')
         
@@ -43,6 +50,7 @@ class MainApp(tk.Tk):
         self.style.configure('Card.TFrame', background='white', relief='raised', borderwidth=1)
 
 
+        # --- UI Widgets (Main Menu) ---
         main_frame = ttk.Frame(self, padding="40")
         main_frame.pack(fill=tk.BOTH, expand=True)
 
@@ -60,11 +68,13 @@ class MainApp(tk.Tk):
         center_window(self)
 
     def open_window(self, window_class):
+        """Generic function to open any module window."""
         try:
             window_class(self)
         except Exception as e:
             messagebox.showerror("Application Error", f"Could not open window: {e}")
 
+    # --- Module Launching Functions ---
     def open_new_candidate_window(self):
         self.open_window(NewCandidateApp)
 
@@ -87,6 +97,7 @@ class MainApp(tk.Tk):
         self.open_window(ApplicantTrackerApp)
     
     def generate_weekly_report(self):
+        """Generates and displays the weekly new hire HTML report."""
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
@@ -141,6 +152,13 @@ class MainApp(tk.Tk):
         except Exception as e:
             messagebox.showerror("Error", f"An unexpected error occurred: {e}", parent=self)
 
+# ==================================================================
+# APPLICATION LAUNCH
+# ==================================================================
+# This standard Python construct ensures that the code inside this block only
+# runs when the script is executed directly.
 if __name__ == "__main__":
     app = MainApp()
+    # This line starts the Tkinter event loop, which makes the window appear and
+    # listen for user actions like button clicks until the window is closed.
     app.mainloop()

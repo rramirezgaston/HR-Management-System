@@ -5,6 +5,12 @@ import datetime
 import re
 from common import get_db_connection, center_window
 
+# ==================================================================
+# NEW CANDIDATE MODULE
+# ==================================================================
+# This class defines the "New Candidate Entry" window. It is a data entry form
+# designed for speed and accuracy, with features like data validation,
+# automatic formatting, and cascading dropdowns to enforce data integrity.
 class NewCandidateApp(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
@@ -22,6 +28,7 @@ class NewCandidateApp(tk.Toplevel):
         center_window(self, parent)
 
     def load_initial_data(self):
+        """Fetches initial data from the database to populate the dropdowns and listbox."""
         try:
             conn = get_db_connection()
             cursor = conn.cursor()
@@ -40,6 +47,7 @@ class NewCandidateApp(tk.Toplevel):
             messagebox.showerror("Database Error", f"Failed to load initial data: {e}", parent=self)
 
     def on_department_select(self, event):
+        """Event handler for when a department is selected. It populates the job details dropdown."""
         selected_dept = self.department_combobox.get()
         self.job_detail_combobox.set('')
         self.job_detail_combobox['state'] = 'readonly'
@@ -56,6 +64,7 @@ class NewCandidateApp(tk.Toplevel):
             messagebox.showerror("Database Error", f"Failed to load job details: {e}", parent=self)
 
     def format_phone_on_focus_out(self, event):
+        """Automatically formats the phone number field when the user clicks away."""
         widget = event.widget
         digits = re.sub(r'\D', '', widget.get())
         if len(digits) > 10:
@@ -73,6 +82,7 @@ class NewCandidateApp(tk.Toplevel):
         widget.insert(0, formatted)
 
     def format_date_on_focus_out(self, event):
+        """Automatically formats date fields to YYYY-MM-DD when the user clicks away."""
         widget = event.widget
         date_str = widget.get().strip()
         if not date_str:
@@ -92,6 +102,7 @@ class NewCandidateApp(tk.Toplevel):
             messagebox.showwarning("Invalid Date", f"Could not understand date: '{date_str}'.\nPlease use a format like MM/DD/YYYY.", parent=self)
 
     def create_widgets(self):
+        """Builds the entire user interface for the module."""
         main_frame = ttk.Frame(self, padding="20")
         main_frame.pack(fill=tk.BOTH, expand=True)
         ttk.Label(main_frame, text="* Indicates a mandatory field", foreground="red").grid(row=0, column=1, sticky=tk.W, pady=(0, 10))
@@ -132,6 +143,7 @@ class NewCandidateApp(tk.Toplevel):
         ttk.Button(main_frame, text="Clear Form", command=self.clear_form).grid(row=current_row, column=0, columnspan=2, pady=5)
 
     def save_candidate(self):
+        """Validates form data and saves the new candidate to the database."""
         first_name = self.entries["First Name:"].get().strip()
         last_name = self.entries["Last Name:"].get().strip()
         if not first_name or not last_name:
@@ -158,6 +170,7 @@ class NewCandidateApp(tk.Toplevel):
             messagebox.showerror("Database Error", f"Failed to save candidate: {e}", parent=self)
 
     def clear_form(self):
+        """Resets all fields on the form to their default state."""
         for entry in self.entries.values():
             entry.delete(0, tk.END)
         self.department_combobox.set('')

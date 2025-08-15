@@ -4,6 +4,12 @@ from tkinter import ttk, messagebox, Listbox
 import datetime
 from common import get_db_connection, center_window
 
+# ==================================================================
+# ADMIN MODULE
+# ==================================================================
+# This class defines the main "System Administration" window.
+# It provides a UI for managing the core lookup tables of the database:
+# Jobs, Interviewers, and Hiring_Classes.
 class AdminApp(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
@@ -12,36 +18,46 @@ class AdminApp(tk.Toplevel):
         self.geometry("1100x600")
         self.transient(parent)
         self.grab_set()
+        
         self.create_tabs()
         self.refresh_all_tabs()
+        
         center_window(self, parent)
         
     def create_tabs(self):
+        """Builds the main tabbed interface for the window."""
         notebook = ttk.Notebook(self)
         notebook.pack(pady=10, padx=10, fill="both", expand=True)
+        
         jobs_frame = ttk.Frame(notebook, padding="10")
         interviewers_frame = ttk.Frame(notebook, padding="10")
         classes_frame = ttk.Frame(notebook, padding="10")
+        
         notebook.add(jobs_frame, text='Manage Jobs')
         notebook.add(interviewers_frame, text='Manage Interviewers')
         notebook.add(classes_frame, text='Manage Hiring Classes')
+        
         self.create_jobs_tab(jobs_frame)
         self.create_interviewers_tab(interviewers_frame)
         self.create_classes_tab(classes_frame)
 
     def refresh_all_tabs(self):
+        """Helper function to reload data in all tabs simultaneously."""
         self.load_jobs()
         self.load_interviewers()
         self.load_classes()
 
     def create_action_panel(self, parent, add_cmd, edit_cmd, delete_cmd):
+        """Creates the reusable 'Add New', 'Edit Selected', 'Delete Selected' button panel."""
         action_frame = ttk.LabelFrame(parent, text="Actions", padding="10")
         action_frame.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
         ttk.Button(action_frame, text="Add New", command=add_cmd).pack(fill=tk.X, pady=5)
         ttk.Button(action_frame, text="Edit Selected", command=edit_cmd).pack(fill=tk.X, pady=5)
         ttk.Button(action_frame, text="Delete Selected", command=delete_cmd).pack(fill=tk.X, pady=5)
 
+    # --- Jobs Tab ---
     def create_jobs_tab(self, parent_frame):
+        """Builds the UI content for the 'Manage Jobs' tab."""
         display_frame = ttk.LabelFrame(parent_frame, text="Existing Jobs", padding="10")
         display_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         cols = ('department', 'shift', 'pay', 'type')
@@ -59,6 +75,7 @@ class AdminApp(tk.Toplevel):
         self.create_action_panel(parent_frame, self.open_add_job_window, self.open_edit_job_window, self.delete_job)
 
     def load_jobs(self):
+        """Clears and reloads the data in the Jobs Treeview from the database."""
         for item in self.jobs_tree.get_children():
             self.jobs_tree.delete(item)
         try:
@@ -72,9 +89,11 @@ class AdminApp(tk.Toplevel):
             messagebox.showerror("DB Error", f"Failed to load jobs: {e}", parent=self)
 
     def open_add_job_window(self):
+        """Launches the AddJobWindow pop-up."""
         AddJobWindow(self)
 
     def open_edit_job_window(self, event=None):
+        """Launches the EditJobWindow for the selected item."""
         selection = self.jobs_tree.selection()
         if not selection: 
             if event is None:
@@ -83,11 +102,13 @@ class AdminApp(tk.Toplevel):
         EditJobWindow(self, selection[0])
 
     def delete_job(self):
+        """Deletes the selected job after a safety check and confirmation."""
         selection = self.jobs_tree.selection()
         if not selection:
             messagebox.showwarning("Selection Error", "Please select a job to delete.", parent=self)
             return
         job_id = selection[0]
+        # Safety check: Query the database to see if any candidates are linked to this job.
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM Candidates WHERE fk_job_id = ?", (job_id,))
@@ -105,7 +126,9 @@ class AdminApp(tk.Toplevel):
             except sqlite3.Error as e:
                 messagebox.showerror("DB Error", f"Failed to delete job: {e}", parent=self)
 
+    # --- Interviewers Tab ---
     def create_interviewers_tab(self, parent_frame):
+        """Builds the UI content for the 'Manage Interviewers' tab."""
         display_frame = ttk.LabelFrame(parent_frame, text="Existing Interviewers", padding="10")
         display_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         self.interviewers_listbox = Listbox(display_frame, height=15)
@@ -114,6 +137,7 @@ class AdminApp(tk.Toplevel):
         self.create_action_panel(parent_frame, self.open_add_interviewer_window, self.open_edit_interviewer_window, self.delete_interviewer)
 
     def load_interviewers(self):
+        """Clears and reloads the data in the Interviewers Listbox."""
         self.interviewers_listbox.delete(0, tk.END)
         self.interviewers_map = {}
         try:
@@ -128,9 +152,11 @@ class AdminApp(tk.Toplevel):
             messagebox.showerror("DB Error", f"Failed to load interviewers: {e}", parent=self)
 
     def open_add_interviewer_window(self):
+        """Launches the AddEditInterviewerWindow pop-up in 'add' mode."""
         AddEditInterviewerWindow(self)
 
     def open_edit_interviewer_window(self, event=None):
+        """Launches the AddEditInterviewerWindow for the selected item in 'edit' mode."""
         selection = self.interviewers_listbox.curselection()
         if not selection: 
             if event is None:
@@ -141,6 +167,7 @@ class AdminApp(tk.Toplevel):
         AddEditInterviewerWindow(self, interviewer_id, name)
 
     def delete_interviewer(self):
+        """Deletes the selected interviewer after a safety check and confirmation."""
         selection = self.interviewers_listbox.curselection()
         if not selection:
             messagebox.showwarning("Selection Error", "Please select an interviewer to delete.", parent=self)
@@ -164,7 +191,9 @@ class AdminApp(tk.Toplevel):
             except sqlite3.Error as e:
                 messagebox.showerror("DB Error", f"Failed to delete interviewer: {e}", parent=self)
 
+    # --- Classes Tab ---
     def create_classes_tab(self, parent_frame):
+        """Builds the UI content for the 'Manage Hiring Classes' tab."""
         display_frame = ttk.LabelFrame(parent_frame, text="Existing Class Dates", padding="10")
         display_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         self.classes_listbox = Listbox(display_frame, height=15)
@@ -173,6 +202,7 @@ class AdminApp(tk.Toplevel):
         self.create_action_panel(parent_frame, self.open_add_class_window, self.open_edit_class_window, self.delete_class)
 
     def load_classes(self):
+        """Clears and reloads the data in the Hiring Classes Listbox."""
         self.classes_listbox.delete(0, tk.END)
         self.classes_map = {}
         try:
@@ -187,9 +217,11 @@ class AdminApp(tk.Toplevel):
             messagebox.showerror("DB Error", f"Failed to load classes: {e}", parent=self)
             
     def open_add_class_window(self):
+        """Launches the AddEditClassWindow pop-up in 'add' mode."""
         AddEditClassWindow(self)
 
     def open_edit_class_window(self, event=None):
+        """Launches the AddEditClassWindow for the selected item in 'edit' mode."""
         selection = self.classes_listbox.curselection()
         if not selection: 
             if event is None:
@@ -200,6 +232,7 @@ class AdminApp(tk.Toplevel):
         AddEditClassWindow(self, class_id, date_str)
 
     def delete_class(self):
+        """Deletes the selected class after a safety check and confirmation."""
         selection = self.classes_listbox.curselection()
         if not selection:
             messagebox.showwarning("Selection Error", "Please select a class to delete.", parent=self)
@@ -223,7 +256,14 @@ class AdminApp(tk.Toplevel):
             except sqlite3.Error as e:
                 messagebox.showerror("DB Error", f"Failed to delete class: {e}", parent=self)
 
+# ==================================================================
+# POP-UP WINDOW CLASSES
+# ==================================================================
+# These are smaller Toplevel windows that are opened by the main AdminApp.
+# Each one is a self-contained form for a single purpose.
+
 class AddJobWindow(tk.Toplevel):
+    """A pop-up window with a form to add a new job."""
     def __init__(self, parent):
         super().__init__(parent)
         self.withdraw()
@@ -253,6 +293,7 @@ class AddJobWindow(tk.Toplevel):
         ttk.Button(main_frame, text="Add Job", command=self.add_job).pack(pady=10)
 
     def add_job(self):
+        """Validates form input and saves the new job to the database."""
         dept = self.dept_entry.get().strip()
         shift = self.shift_entry.get().strip()
         pay = self.pay_combo.get()
@@ -273,6 +314,7 @@ class AddJobWindow(tk.Toplevel):
             messagebox.showerror("DB Error", f"Failed to add job: {e}", parent=self)
 
 class EditJobWindow(tk.Toplevel):
+    """A pop-up window with a form to edit an existing job."""
     def __init__(self, parent, job_id):
         super().__init__(parent)
         self.withdraw()
@@ -304,6 +346,7 @@ class EditJobWindow(tk.Toplevel):
         ttk.Button(main_frame, text="Save Changes", command=self.save_changes).pack(pady=10)
 
     def load_job_data(self):
+        """Fetches the data for the selected job and populates the form."""
         try:
             conn = get_db_connection()
             conn.row_factory = sqlite3.Row
@@ -321,6 +364,7 @@ class EditJobWindow(tk.Toplevel):
             self.destroy()
 
     def save_changes(self):
+        """Validates form input and updates the job record in the database."""
         dept = self.dept_var.get().strip()
         shift = self.shift_var.get().strip()
         pay = self.pay_var.get()
@@ -341,6 +385,7 @@ class EditJobWindow(tk.Toplevel):
             messagebox.showerror("DB Error", f"Failed to update job: {e}", parent=self)
 
 class AddEditInterviewerWindow(tk.Toplevel):
+    """A pop-up window for adding or editing an interviewer."""
     def __init__(self, parent, interviewer_id=None, interviewer_name=""):
         super().__init__(parent)
         self.withdraw()
@@ -359,6 +404,7 @@ class AddEditInterviewerWindow(tk.Toplevel):
         center_window(self, parent)
 
     def save(self):
+        """Saves the new or edited interviewer name."""
         name = self.name_var.get().strip()
         if not name:
             messagebox.showwarning("Input Error", "Interviewer name cannot be empty.", parent=self)
@@ -380,6 +426,7 @@ class AddEditInterviewerWindow(tk.Toplevel):
             messagebox.showerror("DB Error", f"Failed to save interviewer: {e}", parent=self)
 
 class AddEditClassWindow(tk.Toplevel):
+    """A pop-up window for adding or editing a hiring class date."""
     def __init__(self, parent, class_id=None, class_date=""):
         super().__init__(parent)
         self.withdraw()
@@ -398,6 +445,7 @@ class AddEditClassWindow(tk.Toplevel):
         center_window(self, parent)
 
     def save(self):
+        """Saves the new or edited class date."""
         date_str = self.date_var.get().strip()
         try:
             datetime.datetime.strptime(date_str, '%Y-%m-%d')

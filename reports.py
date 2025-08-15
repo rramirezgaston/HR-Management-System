@@ -6,6 +6,11 @@ import webbrowser
 import os
 from common import get_db_connection, center_window
 
+# ==================================================================
+# REPORTS MODULE
+# ==================================================================
+# This class defines the "Run Reports" window. It provides a user interface
+# for generating various analytical reports based on the data in the database.
 class ReportsApp(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
@@ -18,6 +23,7 @@ class ReportsApp(tk.Toplevel):
         center_window(self, parent)
 
     def create_widgets(self):
+        """Builds the entire user interface for the module."""
         main_frame = ttk.Frame(self, padding="20")
         main_frame.pack(fill=tk.BOTH, expand=True)
         controls_frame = ttk.LabelFrame(main_frame, text="Report Options", padding="10")
@@ -45,6 +51,7 @@ class ReportsApp(tk.Toplevel):
         self.no_referrals_tree = self.create_referral_tree(self.no_referrals_frame, show_referrer=False)
         
     def create_single_results_tree(self, parent):
+        """Reusable helper function to create a generic Treeview for single-table reports."""
         frame = ttk.Frame(parent)
         tree = ttk.Treeview(frame, show='headings')
         v_scroll = ttk.Scrollbar(frame, orient=tk.VERTICAL, command=tree.yview)
@@ -57,6 +64,7 @@ class ReportsApp(tk.Toplevel):
         return frame, tree
 
     def create_referral_tree(self, parent, show_referrer=True):
+        """Reusable helper function to create the specific Treeview for referral reports."""
         cols = ('last_name', 'first_name', 'referred_by', 'department', 'status') if show_referrer else ('last_name', 'first_name', 'department', 'status')
         tree = ttk.Treeview(parent, columns=cols, show='headings')
         for col in cols:
@@ -71,6 +79,7 @@ class ReportsApp(tk.Toplevel):
         return tree
 
     def on_report_select(self, event):
+        """Event handler that shows/hides the correct input fields based on the selected report."""
         report_type = self.report_var.get()
         for widget in self.dynamic_controls_frame.winfo_children():
             widget.destroy()
@@ -110,6 +119,7 @@ class ReportsApp(tk.Toplevel):
             self.referral_paned_window.pack_forget()
 
     def run_report(self):
+        """Main logic function that routes to the correct report generation method."""
         report_type = self.report_var.get()
         if not report_type:
             messagebox.showwarning("Selection Error", "Please select a report to run.", parent=self)
@@ -211,24 +221,29 @@ class ReportsApp(tk.Toplevel):
             messagebox.showerror("Error", f"An unexpected error occurred: {e}", parent=self)
 
     def setup_treeview(self, tree, columns):
+        """Configures a Treeview's columns and headings."""
         tree['columns'] = columns
         for col in columns:
             tree.heading(col, text=col.replace('_', ' ').title())
             tree.column(col, width=150, anchor=tk.W)
 
     def generate_weekly_activity_report(self, cursor):
+        """Generates the HTML report for the Weekly Activity Snapshot."""
         today = datetime.date.today()
+        # weekday() is Monday=0...Sunday=6. To get to last Saturday, we subtract (today.weekday() + 2) days.
         last_saturday = today - datetime.timedelta(days=today.weekday() + 2)
         last_sunday = last_saturday - datetime.timedelta(days=6)
         
         date_range_str = f"{last_sunday.strftime('%B %d, %Y')} - {last_saturday.strftime('%B %d, %Y')}"
         
+        # --- Fetch Data ---
         cursor.execute("SELECT SUM(apps_reviewed), SUM(interviews_scheduled), SUM(hires_confirmed) FROM Daily_Metrics WHERE metric_date BETWEEN ? AND ?", (last_sunday, last_saturday))
         metrics = cursor.fetchone()
         
         cursor.execute("SELECT category, reason, SUM(count) FROM Daily_Breakdowns db JOIN Daily_Metrics dm ON db.fk_metric_id = dm.metric_id WHERE dm.metric_date BETWEEN ? AND ? GROUP BY category, reason", (last_sunday, last_saturday))
         breakdowns = cursor.fetchall()
 
+        # --- Process Data ---
         data = {
             "Apps Received": metrics['SUM(apps_reviewed)'] or 0,
             "Interviews": metrics['SUM(interviews_scheduled)'] or 0,
@@ -246,6 +261,7 @@ class ReportsApp(tk.Toplevel):
                 else:
                     data["Decline"] += count
 
+        # --- Generate HTML ---
         html_content = f"""
         <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Weekly Activity Snapshot</title>
         <style>

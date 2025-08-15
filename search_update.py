@@ -3,6 +3,11 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from common import get_db_connection, center_window
 
+# ==================================================================
+# SEARCH AND UPDATE MODULE
+# ==================================================================
+# This module provides the main interface for finding and managing existing candidates.
+# It consists of a primary search window (SearchApp) and a pop-up form for editing (EditWindow).
 class SearchApp(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
@@ -15,8 +20,11 @@ class SearchApp(tk.Toplevel):
         center_window(self, parent)
 
     def create_search_widgets(self):
+        """Builds the entire user interface for the search module."""
         main_frame = ttk.Frame(self, padding="20")
         main_frame.pack(fill=tk.BOTH, expand=True)
+        
+        # --- Search Bar ---
         search_frame = ttk.Frame(main_frame)
         search_frame.pack(fill=tk.X, pady=10)
         ttk.Label(search_frame, text="Search by Name, Phone, PN, or EUID:").pack(side=tk.LEFT, padx=(0, 10))
@@ -25,6 +33,8 @@ class SearchApp(tk.Toplevel):
         self.search_entry.pack(side=tk.LEFT, fill=tk.X, expand=True)
         self.search_entry.bind("<Return>", self.search_candidates)
         ttk.Button(search_frame, text="Search", command=self.search_candidates).pack(side=tk.LEFT, padx=(10, 0))
+        
+        # --- Results Table ---
         results_frame = ttk.Frame(main_frame)
         results_frame.pack(fill=tk.BOTH, expand=True, pady=10)
         ttk.Label(results_frame, text="Search Results:").pack(anchor=tk.W)
@@ -40,6 +50,8 @@ class SearchApp(tk.Toplevel):
         h_scroll.pack(side=tk.BOTTOM, fill=tk.X)
         self.results_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         self.results_tree.bind("<Double-1>", self.open_edit_window)
+        
+        # --- Action Buttons ---
         action_frame = ttk.Frame(main_frame)
         action_frame.pack(fill=tk.X, pady=10)
         ttk.Button(action_frame, text="Edit Selected", command=self.open_edit_window).pack(side=tk.LEFT, expand=True, padx=5)
@@ -47,6 +59,7 @@ class SearchApp(tk.Toplevel):
         ttk.Button(action_frame, text="Bulk Update Orientation Letter", command=self.bulk_update_orientation_letter).pack(side=tk.LEFT, expand=True, padx=5)
 
     def search_candidates(self, event=None):
+        """Performs a database search based on the user's input and populates the results table."""
         search_term = self.search_var.get().strip()
         if not search_term:
             messagebox.showwarning("Search Error", "Please enter a search term.", parent=self)
@@ -70,6 +83,7 @@ class SearchApp(tk.Toplevel):
             messagebox.showerror("Database Error", f"Search failed: {e}", parent=self)
 
     def get_selected_candidate_id(self):
+        """Helper function to get the ID of the currently selected candidate in the results tree."""
         selection = self.results_tree.selection()
         if not selection:
             messagebox.showwarning("Selection Error", "Please select a candidate from the list.", parent=self)
@@ -77,11 +91,13 @@ class SearchApp(tk.Toplevel):
         return selection[0]
 
     def open_edit_window(self, event=None):
+        """Opens the EditWindow for the selected candidate."""
         candidate_id = self.get_selected_candidate_id()
         if candidate_id:
             EditWindow(self, candidate_id)
 
     def delete_candidate(self):
+        """Deletes the selected candidate and all related records after confirmation."""
         candidate_id = self.get_selected_candidate_id()
         if not candidate_id:
             return
@@ -91,7 +107,7 @@ class SearchApp(tk.Toplevel):
             try:
                 conn = get_db_connection()
                 cursor = conn.cursor()
-                cursor.execute("DELETE FROM Candidate_Interviewers WHERE fk_candidate_id = ?;", (candidate_id,))
+                # Because of "ON DELETE CASCADE", deleting the candidate will also delete their links in Candidate_Interviewers.
                 cursor.execute("DELETE FROM Candidates WHERE candidate_id = ?;", (candidate_id,))
                 conn.commit()
                 conn.close()
@@ -101,6 +117,7 @@ class SearchApp(tk.Toplevel):
                 messagebox.showerror("Database Error", f"Failed to delete candidate: {e}", parent=self)
 
     def bulk_update_orientation_letter(self):
+        """Updates the 'orientation_letter_sent' flag for all fully cleared candidates starting next week."""
         if not messagebox.askyesno("Confirm Bulk Update", "This will mark 'Orientation Letter Sent' for ALL fully cleared candidates starting next week.\n\nAre you sure you want to proceed?", parent=self):
             return
         sql = """UPDATE Candidates SET orientation_letter_sent = 1 WHERE candidate_id IN (SELECT c.candidate_id FROM Candidates c JOIN Hiring_Classes hc ON c.fk_class_id = hc.class_id WHERE hc.class_date BETWEEN date('now', 'weekday 1') AND date('now', 'weekday 1', '+6 days') AND c.bg_ds_clear = 1 AND c.pre_board_complete = 1 AND c.myinfo_ready = 1 AND c.pn_number IS NOT NULL AND c.pn_number != '' AND c.euid IS NOT NULL AND c.euid != '');"""
@@ -115,6 +132,10 @@ class SearchApp(tk.Toplevel):
         except sqlite3.Error as e:
             messagebox.showerror("Database Error", f"Bulk update failed: {e}", parent=self)
 
+# ==================================================================
+# EDIT CANDIDATE WINDOW
+# ==================================================================
+# This class defines the pop-up window for editing the details of a single candidate.
 class EditWindow(tk.Toplevel):
     def __init__(self, parent, candidate_id):
         super().__init__(parent)
@@ -124,6 +145,9 @@ class EditWindow(tk.Toplevel):
         self.geometry("600x750")
         self.transient(parent)
         self.grab_set()
+        
+        # --- Tkinter Variable Setup ---
+        # Each UI element that can change (like an entry box or checkbox) is linked to a variable.
         self.status_var = tk.StringVar()
         self.screen_status_var = tk.StringVar()
         self.reject_reason_var = tk.StringVar()
@@ -139,11 +163,13 @@ class EditWindow(tk.Toplevel):
         self.department_var = tk.StringVar()
         self.job_detail_var = tk.StringVar()
         self.job_details_map = {}
+        
         self.create_edit_widgets()
         self.load_candidate_data()
         center_window(self, parent)
 
     def create_edit_widgets(self):
+        """Builds the entire user interface for the edit form."""
         main_frame = ttk.Frame(self, padding="20")
         main_frame.pack(fill=tk.BOTH, expand=True)
         self.name_label = ttk.Label(main_frame, text="Editing Candidate: ", font=('Helvetica', 12, 'bold'))
@@ -152,6 +178,9 @@ class EditWindow(tk.Toplevel):
         self.context_frame.grid(row=1, column=0, columnspan=2, sticky=tk.W, pady=(0, 15))
         self.job_label = ttk.Label(self.context_frame, text="Job: ", foreground="gray")
         self.job_label.pack(anchor=tk.W)
+        
+        # --- Form Layout ---
+        # The form is built using the .grid() layout manager for precise alignment.
         row_counter = 2
         ttk.Label(main_frame, text="Hiring Class:").grid(row=row_counter, column=0, sticky=tk.W, pady=5)
         self.class_combobox = ttk.Combobox(main_frame, textvariable=self.class_var, state="readonly")
@@ -197,6 +226,7 @@ class EditWindow(tk.Toplevel):
         ttk.Button(main_frame, text="Save Changes", command=self.save_changes).grid(row=row_counter, column=0, columnspan=2, pady=20)
 
     def on_department_select(self, event):
+        """Event handler for the department dropdown to enable cascading functionality."""
         selected_dept = self.department_var.get()
         self.job_detail_combobox.set('')
         self.job_detail_combobox['state'] = 'readonly'
@@ -213,6 +243,7 @@ class EditWindow(tk.Toplevel):
             messagebox.showerror("Database Error", f"Failed to load job details: {e}", parent=self)
 
     def load_candidate_data(self):
+        """Fetches all data for the selected candidate and populates the form fields."""
         try:
             conn = get_db_connection()
             conn.row_factory = sqlite3.Row
@@ -256,6 +287,7 @@ class EditWindow(tk.Toplevel):
             self.destroy()
 
     def save_changes(self):
+        """Gathers all data from the form and saves it to the database using an UPDATE query."""
         new_fk_class_id = self.classes_map.get(self.class_var.get())
         new_fk_job_id = self.job_details_map.get(self.job_detail_var.get())
         sql = "UPDATE Candidates SET candidate_status = ?, screening_status = ?, rejection_reason = ?, bg_ds_clear = ?, pre_board_complete = ?, myinfo_ready = ?, orientation_letter_sent = ?, pn_number = ?, euid = ?, notes = ?, fk_class_id = ?, fk_job_id = ? WHERE candidate_id = ?;"
@@ -273,6 +305,7 @@ class EditWindow(tk.Toplevel):
             conn.commit()
             conn.close()
             messagebox.showinfo("Success", "Candidate details updated successfully.", parent=self)
+            # This is a key part of the interaction: it tells the parent SearchApp to refresh its results.
             if hasattr(self.master, 'search_candidates'):
                 self.master.search_candidates()
             self.destroy()
