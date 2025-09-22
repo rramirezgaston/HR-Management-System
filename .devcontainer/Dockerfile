@@ -1,5 +1,5 @@
 # Use the official Node.js 18 image from Microsoft
-FROM mcr.microsoft.com/devcontainers/typescript-node:18
+FROM mcr.microsoft.com/devcontainers/typescript-node:20
 
 # Set the working directory inside the container
 WORKDIR /workspace

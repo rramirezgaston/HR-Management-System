@@ -1,19 +1,16 @@
 import knex from 'knex';
-import path from 'path';
 
-// Create a configuration object for our database connection
+// Configuration for our new PostgreSQL server
 const dbConfig = {
-  client: 'sqlite3', // Specify that we are using the sqlite3 driver
+  client: 'pg', // Specify the 'pg' (PostgreSQL) driver
   connection: {
-    // We use path.resolve to build a correct path to our database file.
-    filename: path.resolve(__dirname, '../data/HR_Hiring_DB.db'),
+    host: 'db', // The service name we defined in docker-compose.yml
+    user: 'vscode', // The username we defined
+    password: 'password', // The password we defined
+    database: 'hr_db', // The database name we defined
   },
-  // SQLite does not have a default value for fields, so this is a required setting.
-  useNullAsDefault: true,
 };
 
-// Initialize Knex with our configuration
 const db = knex(dbConfig);
 
-// Export the configured db object so we can use it in other files
 export default db;

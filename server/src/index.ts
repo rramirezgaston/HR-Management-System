@@ -1,23 +1,23 @@
 import express from 'express';
-import db from './database'; // Import our new database connection
+import db from './database'; // Our database connection
+import cors from 'cors'; // Import CORS middleware
 
 const app = express();
 const port = 3001;
 
-// We change this route handler to be an 'async' function
-// so we can use 'await' for our database query.
-app.get('/', async (req, res) => {
+app.use(cors()); // Enable CORS for all routes
+// Define our API endpoint at the URL '/api/jobs'
+app.get('/api/jobs', async (req, res) => {
   try {
-    // Use our 'db' object to run a raw SQL query.
-    // This query simply asks the database for its version number.
-    const result = await db.raw('SELECT sqlite_version()');
+    // Use Knex to build a query: SELECT * FROM "Jobs"
+    const jobs = await db('Jobs').select('*');
 
-    // Send the result back as a JSON object
-    res.json({ message: 'Server is connected to the database!', sqliteVersion: result });
+    // Send the list of jobs back as a JSON response
+    res.json(jobs);
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Failed to connect to the database.' });
+    res.status(500).json({ error: 'Failed to fetch jobs.' });
   }
 });
 
