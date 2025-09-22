@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "target": "es6",                     // Compile to modern JavaScript
+    "module": "commonjs",                // Use the standard Node.js module system
+    "rootDir": "./src",                  // Where our source code lives
+    "outDir": "./dist",                  // Where the compiled JavaScript will go
+    "esModuleInterop": true,             // Allows for better module compatibility
+    "strict": true                       // Enforces stricter type-checking
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "HR Management System",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "humao.rest-client",
+        "ms-postgresql.postgresql"
+      ]
+    }
+  }
+}
