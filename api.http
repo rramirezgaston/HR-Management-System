@@ -9,3 +9,17 @@ Content-Type: application/json
   "department": "Warehouse",
   "shift": "1st Shift"
 }
+
+###
+
+DELETE http://localhost:3001/api/jobs/1
+
+###
+
+PUT http://localhost:3001/api/jobs/3
+Content-Type: application/json
+
+{
+  "department": "UPDATED Department",
+  "shift": "UPDATED Shift"
+}

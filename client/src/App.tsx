@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import './App.css';
-import AddJobForm from './components/AddJobForm'; // 1. Import the new component
+import AddJobForm from './components/AddJobForm';
+import EditJobForm from './components/EditJobForm';
 
 interface Job {
   job_id: number;
@@ -10,33 +11,63 @@ interface Job {
 
 function App() {
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [editingJob, setEditingJob] = useState<Job | null>(null);
 
-  // Create a function to fetch the jobs list.
-  // We use useCallback to prevent it from being recreated on every render.
   const fetchJobs = useCallback(async () => {
     const response = await fetch('/api/jobs');
     const data = await response.json();
     setJobs(data);
   }, []);
 
-  // useEffect now calls our fetchJobs function when the component loads.
   useEffect(() => {
     fetchJobs();
   }, [fetchJobs]);
+
+  const handleDelete = async (idToDelete: number) => {
+    await fetch(`/api/jobs/${idToDelete}`, {
+      method: 'DELETE',
+    });
+    fetchJobs();
+  };
+
+  const handleJobUpdated = () => {
+    setEditingJob(null); // Hide the edit form
+    fetchJobs(); // Refresh the jobs list
+  };
 
   return (
     <div>
       <h1>HR Management System</h1>
       <hr />
-      {/* 2. Display the new form component */}
-      {/* We pass the fetchJobs function down to the form as a "prop" */}
-      <AddJobForm onJobAdded={fetchJobs} />
+
+      {/* Conditionally render the forms */}
+      {/* If we are editing a job, show the Edit form. */}
+      {/* Otherwise, show the Add form. */}
+      {editingJob ? (
+        <EditJobForm 
+          jobToEdit={editingJob} 
+          onJobUpdated={handleJobUpdated}
+          onCancel={() => setEditingJob(null)} 
+        />
+      ) : (
+        <AddJobForm onJobAdded={fetchJobs} />
+      )}
+
       <hr />
       <h2>Available Jobs</h2>
       <ul>
         {jobs.map(job => (
           <li key={job.job_id}>
             {job.department} - {job.shift || 'N/A'}
+
+            {/* Add an Edit button for each job */}
+            <button onClick={() => setEditingJob(job)} style={{ marginLeft: '10px' }}>
+              Edit
+            </button>
+
+            <button onClick={() => handleDelete(job.job_id)} style={{ marginLeft: '10px' }}>
+              Delete
+            </button>
           </li>
         ))}
       </ul>
