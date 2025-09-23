@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import './App.css';
+import AddJobForm from './components/AddJobForm'; // 1. Import the new component
 
-// Define a TypeScript "type" for our Job object to ensure type safety.
 interface Job {
   job_id: number;
   department: string;
@@ -9,25 +9,31 @@ interface Job {
 }
 
 function App() {
-  // Create a state variable 'jobs' to hold our array of jobs.
-  // It starts as an empty array [].
   const [jobs, setJobs] = useState<Job[]>([]);
 
-  // useEffect runs when the component first loads.
-  // The empty array [] at the end means it only runs once.
-  useEffect(() => {
-    // Fetch data from our back-end API.
-    fetch('http://localhost:3001/api/jobs')
-      .then(response => response.json())
-      .then(data => setJobs(data)); // Update the 'jobs' state with the fetched data
+  // Create a function to fetch the jobs list.
+  // We use useCallback to prevent it from being recreated on every render.
+  const fetchJobs = useCallback(async () => {
+    const response = await fetch('/api/jobs');
+    const data = await response.json();
+    setJobs(data);
   }, []);
+
+  // useEffect now calls our fetchJobs function when the component loads.
+  useEffect(() => {
+    fetchJobs();
+  }, [fetchJobs]);
 
   return (
     <div>
       <h1>HR Management System</h1>
+      <hr />
+      {/* 2. Display the new form component */}
+      {/* We pass the fetchJobs function down to the form as a "prop" */}
+      <AddJobForm onJobAdded={fetchJobs} />
+      <hr />
       <h2>Available Jobs</h2>
       <ul>
-        {/* Map over the 'jobs' array and create a list item for each one */}
         {jobs.map(job => (
           <li key={job.job_id}>
             {job.department} - {job.shift || 'N/A'}

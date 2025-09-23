@@ -1,1 +1,11 @@
 GET http://localhost:3001/api/jobs
+
+###
+
+POST http://localhost:3001/api/jobs
+Content-Type: application/json
+
+{
+  "department": "Warehouse",
+  "shift": "1st Shift"
+}
