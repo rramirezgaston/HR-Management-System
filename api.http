@@ -23,3 +23,95 @@ Content-Type: application/json
   "department": "UPDATED Department",
   "shift": "UPDATED Shift"
 }
+
+### Candidates ###
+
+# GET all candidates
+GET http://localhost:3001/api/candidates
+
+###
+
+# POST a new candidate (only include a few fields for the test)
+POST http://localhost:3001/api/candidates
+Content-Type: application/json
+
+{
+  "first_name": "John",
+  "last_name": "Doe",
+  "candidate_status": "Pending"
+}
+
+### Update a candidate
+PUT http://localhost:3001/api/candidates/2
+Content-Type: application/json
+
+{
+  "first_name": "Jane",
+  "last_name": "Doe",
+  "candidate_status": "Hired"
+}
+
+###
+
+### Delete a candidate
+DELETE http://localhost:3001/api/candidates/1
+
+### Interviewers ###
+# GET all interviewers
+GET http://localhost:3001/api/interviewers
+
+###
+
+# POST a new interviewer
+POST http://localhost:3001/api/interviewers
+Content-Type: application/json
+
+{
+  "interviewer_name": "Alice Smith"
+}
+
+###
+
+# Update an interviewer
+# Replace '1' with a real ID
+PUT http://localhost:3001/api/interviewers/1
+Content-Type: application/json
+
+{
+  "interviewer_name": "Bob Johnson"
+}
+
+###
+
+# Delete an interviewer
+# Replace '1' with a real ID
+DELETE http://localhost:3001/api/interviewers/1
+
+### Hiring Classes ###
+# GET all hiring classes
+GET http://localhost:3001/api/hiring-classes
+
+###
+# POST a new hiring class
+POST http://localhost:3001/api/hiring-classes
+Content-Type: application/json
+
+{
+  "class_date": "2025-05-01"
+}
+
+###
+# Update a hiring class
+# Replace '1' with a real ID
+PUT http://localhost:3001/api/hiring-classes/1
+Content-Type: application/json
+
+{
+  "class_date": "2025-06-01"
+}
+
+###
+# Delete a hiring class
+# Replace '1' with a real ID
+DELETE http://localhost:3001/api/hiring-classes/1
+

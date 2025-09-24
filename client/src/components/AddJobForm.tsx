@@ -1,8 +1,5 @@
 import { useState } from 'react';
 
-// We define a "prop" for our component. It will be a function that
-// this component can call to tell its parent (App.tsx) that a new
-// job has been added, so the list can be refreshed.
 interface AddJobFormProps {
   onJobAdded: () => void;
 }
