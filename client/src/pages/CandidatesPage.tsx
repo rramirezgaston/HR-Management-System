@@ -1,7 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import '../App.css';
 import AddCandidateForm from '../components/AddCandidateForm';
 import EditCandidateForm from '../components/EditCandidateForm';
+import Typography from '@mui/material/Typography';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import IconButton from '@mui/material/IconButton';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 interface Candidate {
   candidate_id: number;
@@ -43,10 +48,8 @@ function CandidatesPage() {
 
   return (
     <div>
-      <h2>Manage Candidates</h2>
-      <hr />
-
-      {/* Conditionally render the Add or Edit form */}
+      <Typography variant="h4" gutterBottom>Manage Candidates</Typography>
+      
       {editingCandidate ? (
         <EditCandidateForm
           candidateToEdit={editingCandidate}
@@ -57,23 +60,21 @@ function CandidatesPage() {
         <AddCandidateForm onCandidateAdded={fetchCandidates} />
       )}
 
-      <hr />
-      <h3>Current Candidates</h3>
-      <ul>
+      <Typography variant="h5" sx={{ mt: 4 }}>Current Candidates</Typography>
+      <List>
         {candidates.map(candidate => (
-          <li key={candidate.candidate_id}>
+          <ListItem key={candidate.candidate_id}>
             {candidate.first_name} {candidate.last_name} ({candidate.candidate_status})
-
-            {/* Add Edit and Delete buttons */}
-            <button onClick={() => setEditingCandidate(candidate)} style={{ marginLeft: '10px' }}>
-              Edit
-            </button>
-            <button onClick={() => handleDelete(candidate.candidate_id)} style={{ marginLeft: '10px' }}>
-              Delete
-            </button>
-          </li>
+           
+            <IconButton edge="end" aria-label="edit" onClick={() => setEditingCandidate(candidate)} style={{ marginLeft: '10px' }}>
+              <EditIcon />
+            </IconButton>
+            <IconButton edge="end" aria-label="edit" onClick={() => handleDelete(candidate.candidate_id)} style={{ marginLeft: '10px' }}>
+              <DeleteIcon />
+            </IconButton>
+          </ListItem>
         ))}
-      </ul>
+      </List>
     </div>
   );
 }

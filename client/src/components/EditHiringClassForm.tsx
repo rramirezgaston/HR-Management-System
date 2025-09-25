@@ -1,4 +1,9 @@
 import { useState } from 'react';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+
 
 interface EditHiringClassFormProps {
     hiringClassToEdit: {
@@ -31,20 +36,21 @@ function EditHiringClassForm({ hiringClassToEdit, onHiringClassUpdated, onCancel
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <h3>Edit Hiring Class</h3>
-            <div>
-                <label>Class Date:</label>
-                <input
-                    type="date"
-                    value={classDate}
-                    onChange={(e) => setClassDate(e.target.value)}
-                    required
+        <Box component="form" onSubmit={handleSubmit} sx={{ mb: 2 }}>
+            <Typography variant="h6">Edit Hiring Class</Typography>
+            <Box>
+                <TextField
+                type="date"
+                value={classDate}
+                onChange={(e) => setClassDate(e.target.value)}
+                required
+                fullWidth
+                margin='normal'
                 />
-            </div>
-            <button type="submit">Update Hiring Class</button>
-            <button type="button" onClick={onCancel}>Cancel</button>
-        </form>
+            </Box>
+            <Button type="submit" variant="contained" sx={{ mr: 1 }}>Update Hiring Class</Button>
+            <Button type="submit" variant="contained" sx={{ mr: 1 }} onClick={onCancel}>Cancel</Button>
+        </Box>
     );
 }
 

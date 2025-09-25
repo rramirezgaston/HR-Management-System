@@ -1,57 +1,49 @@
 import { useState } from 'react';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 
 interface AddJobFormProps {
   onJobAdded: () => void;
 }
 
 function AddJobForm({ onJobAdded }: AddJobFormProps) {
-  // Create state variables to hold the values of our form inputs
   const [department, setDepartment] = useState('');
   const [shift, setShift] = useState('');
 
-  // This function runs when the form is submitted
   const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault(); // Prevent the default browser form submission
-
-    // Send a POST request to our back-end API
+    event.preventDefault();
     await fetch('/api/jobs', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ department, shift }),
     });
-
-    // Clear the form inputs after submission
     setDepartment('');
     setShift('');
-
-    // Call the function passed down from the parent to signal that we're done
     onJobAdded();
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h3>Add New Job</h3>
-      <div>
-        <label>Department:</label>
-        <input
-          type="text"
-          value={department}
-          onChange={(e) => setDepartment(e.target.value)}
-          required
-        />
-      </div>
-      <div>
-        <label>Shift:</label>
-        <input
-          type="text"
-          value={shift}
-          onChange={(e) => setShift(e.target.value)}
-        />
-      </div>
-      <button type="submit">Add Job</button>
-    </form>
+    <Box component="form" onSubmit={handleSubmit} sx={{ mb: 2 }}>
+      <Typography variant="h6">Add New Job</Typography>
+      <TextField
+        label="Department"
+        value={department}
+        onChange={(e) => setDepartment(e.target.value)}
+        required
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        label="Shift"
+        value={shift}
+        onChange={(e) => setShift(e.target.value)}
+        fullWidth
+        margin="normal"
+      />
+      <Button type="submit" variant="contained">Add Job</Button>
+    </Box>
   );
 }
 

@@ -115,3 +115,25 @@ Content-Type: application/json
 # Replace '1' with a real ID
 DELETE http://localhost:3001/api/hiring-classes/1
 
+### Applicant Tracker ###
+
+# GET metrics for a specific date and department
+GET http://localhost:3001/api/metrics?date=2025-10-20&department=Selectors
+
+###
+
+# POST (create or update) metrics for a specific date and department
+POST http://localhost:3001/api/metrics
+Content-Type: application/json
+
+{
+  "date": "2025-10-20",
+  "department": "Selectors",
+  "apps_reviewed": 50,
+  "interviews_scheduled": 10,
+  "hires_confirmed": 3,
+  "breakdowns": [
+    { "category": "post_interview_rejection", "reason": "NCNS", "count": 2 },
+    { "category": "pre_interview_withdrawal", "reason": "Pay", "count": 5 }
+  ]
+}

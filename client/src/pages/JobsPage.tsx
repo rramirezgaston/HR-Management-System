@@ -1,15 +1,19 @@
 import { useState, useEffect, useCallback } from 'react';
-import '../App.css';
 import AddJobForm from '../components/AddJobForm';
 import EditJobForm from '../components/EditJobForm';
+import Typography from '@mui/material/Typography';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import IconButton from '@mui/material/IconButton';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 interface Job {
-  job_id: number;
-  department: string;
-  shift: string;
+  job_id: number; department: string; shift: string;
 }
 
-function JobsPage() {
+export default function JobsPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [editingJob, setEditingJob] = useState<Job | null>(null);
 
@@ -24,55 +28,52 @@ function JobsPage() {
   }, [fetchJobs]);
 
   const handleDelete = async (idToDelete: number) => {
-    await fetch(`/api/jobs/${idToDelete}`, {
-      method: 'DELETE',
-    });
+    await fetch(`/api/jobs/${idToDelete}`, { method: 'DELETE' });
     fetchJobs();
   };
 
   const handleJobUpdated = () => {
-    setEditingJob(null); // Hide the edit form
-    fetchJobs(); // Refresh the jobs list
+    setEditingJob(null);
+    fetchJobs();
   };
 
   return (
     <div>
-      <h1>HR Management System</h1>
-      <hr />
+      <Typography variant="h4" gutterBottom>Manage Jobs</Typography>
 
-      {/* Conditionally render the forms */}
-      {/* If we are editing a job, show the Edit form. */}
-      {/* Otherwise, show the Add form. */}
       {editingJob ? (
-        <EditJobForm 
-          jobToEdit={editingJob} 
+        <EditJobForm
+          jobToEdit={editingJob}
           onJobUpdated={handleJobUpdated}
-          onCancel={() => setEditingJob(null)} 
+          onCancel={() => setEditingJob(null)}
         />
       ) : (
         <AddJobForm onJobAdded={fetchJobs} />
       )}
 
-      <hr />
-      <h2>Available Jobs</h2>
-      <ul>
+      <Typography variant="h5" sx={{ mt: 4 }}>Current Jobs</Typography>
+      <List>
         {jobs.map(job => (
-          <li key={job.job_id}>
-            {job.department} - {job.shift || 'N/A'}
-
-            {/* Add an Edit button for each job */}
-            <button onClick={() => setEditingJob(job)} style={{ marginLeft: '10px' }}>
-              Edit
-            </button>
-
-            <button onClick={() => handleDelete(job.job_id)} style={{ marginLeft: '10px' }}>
-              Delete
-            </button>
-          </li>
+          <ListItem
+            key={job.job_id}
+            secondaryAction={
+              <>
+                <IconButton edge="end" aria-label="edit" onClick={() => setEditingJob(job)}>
+                  <EditIcon />
+                </IconButton>
+                <IconButton edge="end" aria-label="delete" onClick={() => handleDelete(job.job_id)}>
+                  <DeleteIcon />
+                </IconButton>
+              </>
+            }
+          >
+            <ListItemText
+              primary={job.department}
+              secondary={job.shift || 'N/A'}
+            />
+          </ListItem>
         ))}
-      </ul>
+      </List>
     </div>
   );
 }
-
-export default JobsPage;

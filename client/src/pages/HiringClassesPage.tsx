@@ -1,7 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import '../App.css';
 import AddHiringClassForm from '../components/AddHiringClassForm';
 import EditHiringClassForm from '../components/EditHiringClassForm';
+import Typography from '@mui/material/Typography';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import IconButton from '@mui/material/IconButton';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 interface HiringClass {
   class_id: number;
@@ -39,10 +44,8 @@ function HiringClassesPage() {
 
   return (
     <div>
-      <h2>Manage Hiring Classes</h2>
-      <hr />
-
-      {/* Conditionally render the Add or Edit form */}
+      <Typography>Manage Hiring Classes</Typography>
+      
       {editingHiringClass ? (
         <EditHiringClassForm
           hiringClassToEdit={editingHiringClass}
@@ -53,17 +56,20 @@ function HiringClassesPage() {
         <AddHiringClassForm onHiringClassAdded={fetchHiringClasses} />
       )}
 
-      <hr />
-      <h3>Current Hiring Classes</h3>
-      <ul>
+      <Typography variant="h5" sx={{ mt: 4 }}>Current Hiring Classes</Typography>
+      <List>
         {hiringClasses.map((hc) => (
-          <li key={hc.class_id}>
+          <ListItem key={hc.class_id}>
             {new Date(hc.class_date).toLocaleDateString('en-US', { timeZone: 'UTC' })}
-            <button onClick={() => setEditingHiringClass(hc)}>Edit</button>{' '}
-            <button onClick={() => handleDelete(hc.class_id)}>Delete</button>
-          </li>
+            <IconButton edge="end" aria-label="edit" onClick={() => setEditingHiringClass(hc)}>
+              <EditIcon />
+            </IconButton>
+            <IconButton edge="end" aria-label="edit" onClick={() => handleDelete(hc.class_id)}>
+              <DeleteIcon />
+            </IconButton>
+          </ListItem>
         ))}
-      </ul>
+      </List>
     </div>
   );
 }

@@ -1,4 +1,8 @@
 import { useState } from 'react';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 
 interface AddHiringClassFormProps {
     onHiringClassAdded: () => void;
@@ -29,19 +33,20 @@ function AddHiringClassForm({ onHiringClassAdded }: AddHiringClassFormProps) {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <h3>Add New Hiring Class</h3>
-            <div>
-                <label>Class Date:</label>
-                <input
-                    type="date"
-                    value={classDate}
-                    onChange={(e) => setClassDate(e.target.value)}
-                    required
+        <Box component="form" onSubmit={handleSubmit} sx={{ mb: 2 }}>
+            <Typography variant="h6">Add New Hiring Class</Typography>
+            <Box>
+                <TextField
+                type="date"
+                value={classDate}
+                onChange={(e) => setClassDate(e.target.value)}
+                required
+                fullWidth
+                margin='normal'
                 />
-            </div>
-            <button type="submit">Add Hiring Class</button>
-        </form>
+            </Box>
+            <Button type="submit" variant="contained">Add Hiring Class</Button>
+        </Box>
     );
 }
 

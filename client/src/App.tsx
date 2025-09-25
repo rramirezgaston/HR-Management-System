@@ -3,6 +3,7 @@ import Layout from './components/Layout';
 import JobsPage from './pages/JobsPage';
 import CandidatesPage from './pages/CandidatesPage';
 import HiringClassesPage from './pages/HiringClassesPage';
+import ApplicantTrackerPage from './pages/ApplicantTrackerPage';
 
 // Define the application's routes
 const router = createBrowserRouter([
@@ -21,7 +22,11 @@ const router = createBrowserRouter([
       {
         path: 'hiring-classes', // Renders at /hiring-classes
         element: <HiringClassesPage />,
-      }
+      },
+      {
+        path: 'applicant-tracker',
+        element: <ApplicantTrackerPage />,
+      },
     ],
   },
 ]);

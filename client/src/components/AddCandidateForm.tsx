@@ -1,4 +1,13 @@
 import { useState, useEffect } from 'react';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import Select from '@mui/material/Select';
+import type { SelectChangeEvent } from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
 
 // Define the shapes of the data we'll be fetching
 interface Job {
@@ -71,53 +80,48 @@ function AddCandidateForm({ onCandidateAdded }: AddCandidateFormProps) {
     onCandidateAdded();
   };
 
-  return (
-    <form onSubmit={handleSubmit}>
-      <h3>Add New Candidate</h3>
-      <div>
-        <label>First Name:</label>
-        <input
-          type="text"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-          required
-        />
-      </div>
-      <div>
-        <label>Last Name:</label>
-        <input
-          type="text"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
-          required
-        />
-      </div>
-      {/* Dropdown for Jobs */}
-      <div>
-        <label>Job:</label>
-        <select value={fkJobId} onChange={(e) => setFkJobId(e.target.value)}>
-          <option value="">-- Select a Job --</option>
+   return (
+    <Box component="form" onSubmit={handleSubmit} sx={{ mb: 2 }}>
+      <Typography variant="h6">Add New Candidate</Typography>
+      <TextField
+      label="First Name"
+      value={firstName} onChange={(e) => setFirstName(e.target.value)}
+      required
+      fullWidth
+      margin="normal"
+      />
+      <TextField
+      label="Last Name"
+      value={lastName} onChange={(e) => setLastName(e.target.value)}
+      required
+      fullWidth
+      margin="normal"
+      />
+
+      <FormControl fullWidth margin="normal">
+        <InputLabel id="job-select-label">Job</InputLabel>
+        <Select labelId="job-select-label" value={fkJobId} label="Job" onChange={(e: SelectChangeEvent) => setFkJobId(e.target.value)}>
           {jobs.map(job => (
-            <option key={job.job_id} value={job.job_id}>
+            <MenuItem key={job.job_id} value={job.job_id}>
               {job.department} - {job.shift || 'N/A'}
-            </option>
+            </MenuItem>
           ))}
-        </select>
-      </div>
-      {/* Dropdown for Hiring Classes */}
-      <div>
-        <label>Hiring Class:</label>
-        <select value={fkClassId} onChange={(e) => setFkClassId(e.target.value)}>
-          <option value="">-- Select a Class --</option>
+        </Select>
+      </FormControl>
+
+      <FormControl fullWidth margin="normal">
+        <InputLabel id="class-select-label">Hiring Class</InputLabel>
+        <Select labelId="class-select-label" value={fkClassId} label="Hiring Class" onChange={(e: SelectChangeEvent) => setFkClassId(e.target.value)}>
           {hiringClasses.map(hc => (
-            <option key={hc.class_id} value={hc.class_id}>
+            <MenuItem key={hc.class_id} value={hc.class_id}>
               {new Date(hc.class_date).toLocaleDateString('en-US', { timeZone: 'UTC' })}
-            </option>
+            </MenuItem>
           ))}
-        </select>
-      </div>
-      <button type="submit">Add Candidate</button>
-    </form>
+        </Select>
+      </FormControl>
+
+      <Button type="submit" variant="contained">Add Candidate</Button>
+    </Box>
   );
 }
 

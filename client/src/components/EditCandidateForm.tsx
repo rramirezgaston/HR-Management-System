@@ -1,4 +1,14 @@
 import { useState, useEffect } from 'react';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import Select from '@mui/material/Select';
+import type { SelectChangeEvent } from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+
 
 // Define the shapes of our data objects
 interface Candidate {
@@ -83,51 +93,47 @@ function EditCandidateForm({ candidateToEdit, onCandidateUpdated, onCancel }: Ed
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h3>Edit Candidate: {candidateToEdit.first_name} {candidateToEdit.last_name}</h3>
-      <div>
-        <label>First Name:</label>
-        <input
-          type="text"
+    <Box component="form" onSubmit={handleSubmit}>
+      <Typography variant="h6">Edit Candidate: {candidateToEdit.first_name} {candidateToEdit.last_name}</Typography>
+        <TextField
+          label="First Name"
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
           required
+          fullWidth
+          margin="normal"
         />
-      </div>
-      <div>
-        <label>Last Name:</label>
-        <input
-          type="text"
+        <TextField
+          label="Last Name"
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
           required
+          fullWidth
+          margin="normal"
         />
-      </div>
-      <div>
-        <label>Job:</label>
-        <select value={fkJobId} onChange={(e) => setFkJobId(e.target.value)}>
-          <option value="">-- Select a Job --</option>
+      <FormControl fullWidth margin="normal">
+        <InputLabel id="job-select-label">Job:</InputLabel>
+        <Select labelId="job-select-label" value={fkJobId} label="Job" onChange={(e: SelectChangeEvent) => setFkJobId(e.target.value)}>
           {jobs.map(job => (
-            <option key={job.job_id} value={job.job_id}>
+            <MenuItem key={job.job_id} value={job.job_id}>
               {job.department} - {job.shift || 'N/A'}
-            </option>
+            </MenuItem>
           ))}
-        </select>
-      </div>
-      <div>
-        <label>Hiring Class:</label>
-        <select value={fkClassId} onChange={(e) => setFkClassId(e.target.value)}>
-          <option value="">-- Select a Class --</option>
+        </Select>
+      </FormControl>
+      <FormControl fullWidth margin="normal">
+        <InputLabel id="class-select-label">Hiring Class</InputLabel>
+        <Select labelId="class-select-label" value={fkClassId} label="Hiring Class" onChange={(e: SelectChangeEvent) => setFkClassId(e.target.value)}>
           {hiringClasses.map(hc => (
-            <option key={hc.class_id} value={hc.class_id}>
+            <MenuItem key={hc.class_id} value={hc.class_id}>
               {new Date(hc.class_date).toLocaleDateString('en-US', { timeZone: 'UTC' })}
-            </option>
+            </MenuItem>
           ))}
-        </select>
-      </div>
-      <button type="submit">Save Changes</button>
-      <button type="button" onClick={onCancel}>Cancel</button>
-    </form>
+        </Select>
+      </FormControl>
+      <Button type="submit" variant="contained">Save Changes</Button>
+      <Button type="button" variant="contained" onClick={onCancel}>Cancel</Button>
+    </Box>
   );
 }
 
