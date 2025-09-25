@@ -1,3 +1,5 @@
+**This project is currently undergoing a major refactoring that turns an isolated application connected to a Database into a website solution that can be scaled in the future**
+
 **HR Management System**
 
 **Project Overview**
