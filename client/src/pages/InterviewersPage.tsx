@@ -7,8 +7,8 @@ import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Box from '@mui/material/Box';
-//import AddInterviewerForm from '../components/AddInterviewerForm';
-//import AddInterviewerForm from '../components/AddInterviewerForm';
+import AddInterviewerForm from '../components/AddInterviewerForm';
+import EditInterviewerForm from '../components/EditInterviewerForm';
 
 interface Interviewer {
     interviewer_id: number;
@@ -48,8 +48,8 @@ return (
     <Box>
       <Typography variant="h4" gutterBottom>Manage Interviewers</Typography>
       
-      {/* We will replace these with the correct forms later */}
-      {/* {editingInterviewer ? (
+      
+      {editingInterviewer ? (
         <EditInterviewerForm
           interviewerToEdit={editingInterviewer}
           onInterviewerUpdated={handleInterviewerUpdated}
@@ -57,7 +57,7 @@ return (
         />
       ) : (
         <AddInterviewerForm onInterviewerAdded={fetchInterviewers} />
-      )} */}
+      )}
 
       <Typography variant="h5" sx={{ mt: 4 }}>Current Interviewers</Typography>
       <List>
