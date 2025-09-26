@@ -75,6 +75,5 @@ CREATE TABLE "Daily_Breakdowns" (
 );
 
 -- Add Foreign Key Constraints to Candidates Table
--- (It's often better practice to add these after all tables are created)
 ALTER TABLE "Candidates" ADD FOREIGN KEY ("fk_job_id") REFERENCES "Jobs"("job_id");
 ALTER TABLE "Candidates" ADD FOREIGN KEY ("fk_class_id") REFERENCES "Hiring_Classes"("class_id");
